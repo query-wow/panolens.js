@@ -39,13 +39,13 @@ import TWEEN from '@tweenjs/tween.js';
  * @param {number}  [options.autoRotateSpeed=2.0] - Auto rotate speed as in degree per second. Positive is counter-clockwise and negative is clockwise.
  * @param {number}  [options.autoRotateActivationDuration=5000] - Duration before auto rotatation when no user interactivity in ms
  */
-function Viewer(options) {
+function Viewer ( options ) {
 
     let container;
 
     options = options || {};
     options.controlBar = options.controlBar !== undefined ? options.controlBar : true;
-    options.controlButtons = options.controlButtons || ['fullscreen', 'setting', 'video'];
+    options.controlButtons = options.controlButtons || [ 'fullscreen', 'setting', 'video' ];
     options.autoHideControlBar = options.autoHideControlBar !== undefined ? options.autoHideControlBar : false;
     options.autoHideInfospot = options.autoHideInfospot !== undefined ? options.autoHideInfospot : true;
     options.horizontalView = options.horizontalView !== undefined ? options.horizontalView : false;
@@ -71,7 +71,7 @@ function Viewer(options) {
      */
 
     // Container
-    if (options.container) {
+    if ( options.container ) {
 
         container = options.container;
         container._width = container.clientWidth;
@@ -79,21 +79,21 @@ function Viewer(options) {
 
     } else {
 
-        container = document.createElement('div');
-        container.classList.add('panolens-container');
+        container = document.createElement( 'div' );
+        container.classList.add( 'panolens-container' );
         container.style.width = '100%';
         container.style.height = '100%';
         container._width = window.innerWidth;
         container._height = window.innerHeight;
-        document.body.appendChild(container);
+        document.body.appendChild( container );
 
     }
 
     this.container = container;
 
-    this.camera = options.camera || new THREE.PerspectiveCamera(this.options.cameraFov, this.container.clientWidth / this.container.clientHeight, 1, 10000);
+    this.camera = options.camera || new THREE.PerspectiveCamera( this.options.cameraFov, this.container.clientWidth / this.container.clientHeight, 1, 10000 );
     this.scene = options.scene || new THREE.Scene();
-    this.renderer = options.renderer || new THREE.WebGLRenderer({ alpha: true, antialias: false });
+    this.renderer = options.renderer || new THREE.WebGLRenderer( { alpha: true, antialias: false } );
     this.sceneReticle = new THREE.Scene();
 
     this.viewIndicatorSize = this.options.indicatorSize;
@@ -127,16 +127,16 @@ function Viewer(options) {
     this.touchSupported = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch;
 
     // Handler references
-    this.HANDLER_MOUSE_DOWN = this.onMouseDown.bind(this);
-    this.HANDLER_MOUSE_UP = this.onMouseUp.bind(this);
-    this.HANDLER_MOUSE_MOVE = this.onMouseMove.bind(this);
-    this.HANDLER_WINDOW_RESIZE = this.onWindowResize.bind(this);
-    this.HANDLER_KEY_DOWN = this.onKeyDown.bind(this);
-    this.HANDLER_KEY_UP = this.onKeyUp.bind(this);
-    this.HANDLER_TAP = this.onTap.bind(this, {
+    this.HANDLER_MOUSE_DOWN = this.onMouseDown.bind( this );
+    this.HANDLER_MOUSE_UP = this.onMouseUp.bind( this );
+    this.HANDLER_MOUSE_MOVE = this.onMouseMove.bind( this );
+    this.HANDLER_WINDOW_RESIZE = this.onWindowResize.bind( this );
+    this.HANDLER_KEY_DOWN = this.onKeyDown.bind( this );
+    this.HANDLER_KEY_UP = this.onKeyUp.bind( this );
+    this.HANDLER_TAP = this.onTap.bind( this, {
         clientX: this.container.clientWidth / 2,
         clientY: this.container.clientHeight / 2
-    });
+    } );
 
     // Flag for infospot output
     this.OUTPUT_INFOSPOT = false;
@@ -146,48 +146,48 @@ function Viewer(options) {
     this.tweenUpAnimation = new TWEEN.Tween();
 
     // Renderer
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-    this.renderer.setClearColor(0x000000, 0);
+    this.renderer.setPixelRatio( window.devicePixelRatio );
+    this.renderer.setSize( this.container.clientWidth, this.container.clientHeight );
+    this.renderer.setClearColor( 0x000000, 0 );
     this.renderer.autoClear = false;
 
     // Append Renderer Element to container
-    this.renderer.domElement.classList.add('panolens-canvas');
+    this.renderer.domElement.classList.add( 'panolens-canvas' );
     this.renderer.domElement.style.display = 'block';
     this.container.style.backgroundColor = '#000';
-    this.container.appendChild(this.renderer.domElement);
+    this.container.appendChild( this.renderer.domElement );
 
     // Camera Controls
-    this.OrbitControls = new OrbitControls(this.camera, this.container);
+    this.OrbitControls = new OrbitControls( this.camera, this.container );
     this.OrbitControls.id = 'orbit';
     this.OrbitControls.minDistance = 1;
     this.OrbitControls.noPan = true;
     this.OrbitControls.autoRotate = this.options.autoRotate;
     this.OrbitControls.autoRotateSpeed = this.options.autoRotateSpeed;
 
-    this.DeviceOrientationControls = new DeviceOrientationControls(this.camera, this.container);
+    this.DeviceOrientationControls = new DeviceOrientationControls( this.camera, this.container );
     this.DeviceOrientationControls.id = 'device-orientation';
     this.DeviceOrientationControls.enabled = false;
     this.camera.position.z = 1;
 
     // Register change event if passiveRenering
-    if (this.options.passiveRendering) {
+    if ( this.options.passiveRendering ) {
 
-        console.warn('passiveRendering is now deprecated');
+        console.warn( 'passiveRendering is now deprecated' );
 
     }
 
     // Controls
-    this.controls = [this.OrbitControls, this.DeviceOrientationControls];
+    this.controls = [ this.OrbitControls, this.DeviceOrientationControls ];
     this.control = this.OrbitControls;
 
     // Cardboard effect
-    this.CardboardEffect = new CardboardEffect(this.renderer);
-    this.CardboardEffect.setSize(this.container.clientWidth, this.container.clientHeight);
+    this.CardboardEffect = new CardboardEffect( this.renderer );
+    this.CardboardEffect.setSize( this.container.clientWidth, this.container.clientHeight );
 
     // Stereo effect
-    this.StereoEffect = new StereoEffect(this.renderer);
-    this.StereoEffect.setSize(this.container.clientWidth, this.container.clientHeight);
+    this.StereoEffect = new StereoEffect( this.renderer );
+    this.StereoEffect.setSize( this.container.clientWidth, this.container.clientHeight );
 
     this.effect = this.CardboardEffect;
 
@@ -195,35 +195,35 @@ function Viewer(options) {
     this.addReticle();
 
     // Lock horizontal view
-    if (this.options.horizontalView) {
+    if ( this.options.horizontalView ) {
         this.OrbitControls.minPolarAngle = Math.PI / 2;
         this.OrbitControls.maxPolarAngle = Math.PI / 2;
     }
 
     // Add Control UI
-    if (this.options.controlBar !== false) {
-        this.addDefaultControlBar(this.options.controlButtons);
+    if ( this.options.controlBar !== false ) {
+        this.addDefaultControlBar( this.options.controlButtons );
     }
 
     // Add View Indicator
-    if (this.options.viewIndicator) {
+    if ( this.options.viewIndicator ) {
         this.addViewIndicator();
     }
 
     // Reverse dragging direction
-    if (this.options.reverseDragging) {
+    if ( this.options.reverseDragging ) {
         this.reverseDraggingDirection();
     }
 
     // Register event if reticle is enabled, otherwise defaults to mouse
-    if (this.options.enableReticle) {
+    if ( this.options.enableReticle ) {
         this.enableReticleControl();
     } else {
         this.registerMouseAndTouchEvents();
     }
 
     // Output infospot position to an overlay container if specified
-    if (this.options.output === 'overlay') {
+    if ( this.options.output === 'overlay' ) {
         this.addOutputElement();
     }
 
@@ -231,11 +231,11 @@ function Viewer(options) {
     this.registerEventListeners();
 
     // Animate
-    this.animate.call(this);
+    this.animate.call( this );
 
 };
 
-Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype), {
+Viewer.prototype = Object.assign( Object.create( THREE.EventDispatcher.prototype ), {
 
     constructor: Viewer,
 
@@ -247,13 +247,13 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    add: function (object) {
+    add: function ( object ) {
 
-        if (arguments.length > 1) {
+        if ( arguments.length > 1 ) {
 
-            for (let i = 0; i < arguments.length; i++) {
+            for ( let i = 0; i < arguments.length; i ++ ) {
 
-                this.add(arguments[i]);
+                this.add( arguments[ i ] );
 
             }
 
@@ -261,36 +261,36 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         }
 
-        this.scene.add(object);
+        this.scene.add( object );
 
         // All object added to scene has 'panolens-viewer-handler' event to handle viewer communication
-        if (object.addEventListener) {
+        if ( object.addEventListener ) {
 
-            object.addEventListener('panolens-viewer-handler', this.eventHandler.bind(this));
+            object.addEventListener( 'panolens-viewer-handler', this.eventHandler.bind( this ) );
 
         }
 
         // All object added to scene being passed with container
-        if (object instanceof Panorama && object.dispatchEvent) {
+        if ( object instanceof Panorama && object.dispatchEvent ) {
 
-            object.dispatchEvent({ type: 'panolens-container', container: this.container });
+            object.dispatchEvent( { type: 'panolens-container', container: this.container } );
 
         }
 
-        if (object instanceof CameraPanorama) {
+        if ( object instanceof CameraPanorama ) {
 
-            object.dispatchEvent({ type: 'panolens-scene', scene: this.scene });
+            object.dispatchEvent( { type: 'panolens-scene', scene: this.scene } );
 
         }
 
         // Hookup default panorama event listeners
-        if (object.type === 'panorama') {
+        if ( object.type === 'panorama' ) {
 
-            this.addPanoramaEventListener(object);
+            this.addPanoramaEventListener( object );
 
-            if (!this.panorama) {
+            if ( !this.panorama ) {
 
-                this.setPanorama(object);
+                this.setPanorama( object );
 
             }
 
@@ -300,12 +300,12 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
     getPosition: function () {
         var intersects, point, panoramaWorldPosition, outputPosition;
-        intersects = this.raycaster.intersectObject(this.panorama, true);
-
-        if (intersects.length > 0) {
+        intersects = this.raycaster.intersectObject( this.panorama, true );
+    
+        if ( intersects.length > 0 ) {
             point = intersects[0].point;
             panoramaWorldPosition = this.panorama.getWorldPosition(new THREE.Vector3());
-
+    
             // Panorama is scaled -1 on X axis
             outputPosition = new THREE.Vector3(
                 -(point.x - panoramaWorldPosition.x).toFixed(2),
@@ -313,7 +313,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
                 parseFloat((point.z - panoramaWorldPosition.z).toFixed(2))
             );
         }
-
+    
         return outputPosition;
     },
 
@@ -323,15 +323,15 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    remove: function (object) {
+    remove: function ( object ) {
 
-        if (object.removeEventListener) {
+        if ( object.removeEventListener ) {
 
-            object.removeEventListener('panolens-viewer-handler', this.eventHandler.bind(this));
+            object.removeEventListener( 'panolens-viewer-handler', this.eventHandler.bind( this ) );
 
         }
 
-        this.scene.remove(object);
+        this.scene.remove( object );
 
     },
 
@@ -341,23 +341,23 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    addDefaultControlBar: function (array) {
+    addDefaultControlBar: function ( array ) {
 
-        if (this.widget) {
+        if ( this.widget ) {
 
-            console.warn('Default control bar exists');
+            console.warn( 'Default control bar exists' );
             return;
 
         }
 
-        const widget = new Widget(this.container);
-        widget.addEventListener('panolens-viewer-handler', this.eventHandler.bind(this));
+        const widget = new Widget( this.container );
+        widget.addEventListener( 'panolens-viewer-handler', this.eventHandler.bind( this ) );
         widget.addControlBar();
-        array.forEach(buttonName => {
+        array.forEach( buttonName => {
 
-            widget.addControlButton(buttonName);
+            widget.addControlButton( buttonName );
 
-        });
+        } );
 
         this.widget = widget;
 
@@ -369,27 +369,27 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    setPanorama: function (pano) {
+    setPanorama: function ( pano ) {
 
         const leavingPanorama = this.panorama;
 
-        if (pano.type === 'panorama' && leavingPanorama !== pano) {
+        if ( pano.type === 'panorama' && leavingPanorama !== pano ) {
 
             // Clear exisiting infospot
             this.hideInfospot();
 
             const afterEnterComplete = function () {
 
-                if (leavingPanorama) { leavingPanorama.onLeave(); }
-                pano.removeEventListener('enter-fade-start', afterEnterComplete);
+                if ( leavingPanorama ) { leavingPanorama.onLeave(); }
+                pano.removeEventListener( 'enter-fade-start', afterEnterComplete );
 
             };
 
-            pano.addEventListener('enter-fade-start', afterEnterComplete);
+            pano.addEventListener( 'enter-fade-start', afterEnterComplete );
 
             // Assign and enter panorama
             (this.panorama = pano).onEnter();
-
+			
         }
 
     },
@@ -400,11 +400,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    eventHandler: function (event) {
+    eventHandler: function ( event ) {
 
-        if (event.method && this[event.method]) {
+        if ( event.method && this[ event.method ] ) {
 
-            this[event.method](event.data);
+            this[ event.method ]( event.data );
 
         }
 
@@ -416,13 +416,13 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    dispatchEventToChildren: function (event) {
+    dispatchEventToChildren: function ( event ) {
 
-        this.scene.traverse(function (object) {
+        this.scene.traverse( function ( object ) {
 
-            if (object.dispatchEvent) {
+            if ( object.dispatchEvent ) {
 
-                object.dispatchEvent(event);
+                object.dispatchEvent( event );
 
             }
 
@@ -438,68 +438,68 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    activateWidgetItem: function (controlIndex, mode) {
+    activateWidgetItem: function ( controlIndex, mode ) {
 
         const mainMenu = this.widget.mainMenu;
-        const ControlMenuItem = mainMenu.children[0];
-        const ModeMenuItem = mainMenu.children[1];
+        const ControlMenuItem = mainMenu.children[ 0 ];
+        const ModeMenuItem = mainMenu.children[ 1 ];
 
         let item;
 
-        if (controlIndex !== undefined) {
+        if ( controlIndex !== undefined ) {
 
-            switch (controlIndex) {
+            switch ( controlIndex ) {
 
-                case 0:
+            case 0:
 
-                    item = ControlMenuItem.subMenu.children[1];
+                item = ControlMenuItem.subMenu.children[ 1 ];
 
-                    break;
+                break;
 
-                case 1:
+            case 1:
 
-                    item = ControlMenuItem.subMenu.children[2];
+                item = ControlMenuItem.subMenu.children[ 2 ];
 
-                    break;
+                break;
+					
+            default:
 
-                default:
+                item = ControlMenuItem.subMenu.children[ 1 ];
 
-                    item = ControlMenuItem.subMenu.children[1];
-
-                    break;
+                break;	
 
             }
 
-            ControlMenuItem.subMenu.setActiveItem(item);
-            ControlMenuItem.setSelectionTitle(item.textContent);
+            ControlMenuItem.subMenu.setActiveItem( item );
+            ControlMenuItem.setSelectionTitle( item.textContent );
 
         }
 
-        if (mode !== undefined) {
+        if ( mode !== undefined ) {
 
-            switch (mode) {
+            switch( mode ) {
 
-                case MODES.CARDBOARD:
+            case MODES.CARDBOARD:
 
-                    item = ModeMenuItem.subMenu.children[2];
+                item = ModeMenuItem.subMenu.children[ 2 ];
 
-                    break;
+                break;
 
-                case MODES.STEREO:
+            case MODES.STEREO:
 
-                    item = ModeMenuItem.subMenu.children[3];
+                item = ModeMenuItem.subMenu.children[ 3 ];
+					
+                break;
 
-                    break;
+            default:
 
-                default:
+                item = ModeMenuItem.subMenu.children[ 1 ];
 
-                    item = ModeMenuItem.subMenu.children[1];
-
-                    break;
+                break;
             }
 
-            ModeMenuItem.subMenu.setActiveItem(item);
-            ModeMenuItem.setSelectionTitle(item.textContent);
+            ModeMenuItem.subMenu.setActiveItem( item );
+            ModeMenuItem.setSelectionTitle( item.textContent );
 
         }
 
@@ -511,40 +511,40 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    enableEffect: function (mode) {
+    enableEffect: function ( mode ) {
 
-        if (this.mode === mode) { return; }
-        if (mode === MODES.NORMAL) { this.disableEffect(); return; }
+        if ( this.mode === mode ) { return; }
+        if ( mode === MODES.NORMAL ) { this.disableEffect(); return; }
         else { this.mode = mode; }
 
         const fov = this.camera.fov;
 
-        switch (mode) {
+        switch( mode ) {
 
-            case MODES.CARDBOARD:
+        case MODES.CARDBOARD:
 
-                this.effect = this.CardboardEffect;
-                this.enableReticleControl();
+            this.effect = this.CardboardEffect;
+            this.enableReticleControl();
 
-                break;
+            break;
 
-            case MODES.STEREO:
+        case MODES.STEREO:
 
-                this.effect = this.StereoEffect;
-                this.enableReticleControl();
+            this.effect = this.StereoEffect;
+            this.enableReticleControl();
+				
+            break;
 
-                break;
+        default:
 
-            default:
+            this.effect = null;
+            this.disableReticleControl();
 
-                this.effect = null;
-                this.disableReticleControl();
-
-                break;
+            break;
 
         }
 
-        this.activateWidgetItem(undefined, this.mode);
+        this.activateWidgetItem( undefined, this.mode );
 
         /**
          * Dual eye effect event
@@ -552,11 +552,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @event Infospot#panolens-dual-eye-effect
          * @property {MODES} mode - Current display mode
          */
-        this.dispatchEventToChildren({ type: 'panolens-dual-eye-effect', mode: this.mode });
+        this.dispatchEventToChildren( { type: 'panolens-dual-eye-effect', mode: this.mode } );
 
         // Force effect stereo camera to update by refreshing fov
         this.camera.fov = fov + 10e-3;
-        this.effect.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.effect.setSize( this.container.clientWidth, this.container.clientHeight );
         this.render();
         this.camera.fov = fov;
 
@@ -566,7 +566,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @event Viewer#mode-change
          * @property {MODES} mode - Current display mode
          */
-        this.dispatchEvent({ type: 'mode-change', mode: this.mode });
+        this.dispatchEvent( { type: 'mode-change', mode: this.mode } );
 
     },
 
@@ -577,12 +577,12 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     disableEffect: function () {
 
-        if (this.mode === MODES.NORMAL) { return; }
+        if ( this.mode === MODES.NORMAL ) { return; }
 
         this.mode = MODES.NORMAL;
         this.disableReticleControl();
 
-        this.activateWidgetItem(undefined, this.mode);
+        this.activateWidgetItem( undefined, this.mode );
 
         /**
          * Dual eye effect event
@@ -590,9 +590,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @event Infospot#panolens-dual-eye-effect
          * @property {MODES} mode - Current display mode
          */
-        this.dispatchEventToChildren({ type: 'panolens-dual-eye-effect', mode: this.mode });
+        this.dispatchEventToChildren( { type: 'panolens-dual-eye-effect', mode: this.mode } );
 
-        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.renderer.setSize( this.container.clientWidth, this.container.clientHeight );
         this.render();
 
         /**
@@ -601,7 +601,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @event Viewer#mode-change
          * @property {MODES} mode - Current display mode
          */
-        this.dispatchEvent({ type: 'mode-change', mode: this.mode });
+        this.dispatchEvent( { type: 'mode-change', mode: this.mode } );
     },
 
     /**
@@ -611,7 +611,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     enableReticleControl: function () {
 
-        if (this.reticle.visible) { return; }
+        if ( this.reticle.visible ) { return; }
 
         this.tempEnableReticle = true;
 
@@ -633,7 +633,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         this.tempEnableReticle = false;
 
         // Register mouse event and unregister reticle event
-        if (!this.options.enableReticle) {
+        if ( !this.options.enableReticle ) {
 
             this.reticle.hide();
             this.unregisterReticleEvent();
@@ -666,7 +666,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     disableAutoRate: function () {
 
-        clearTimeout(this.autoRotateRequestId);
+        clearTimeout( this.autoRotateRequestId );
         this.options.autoRotate = false;
         this.OrbitControls.autoRotate = false;
 
@@ -679,16 +679,16 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @instance
      * @fires Viewer#video-toggle
      */
-    toggleVideoPlay: function (pause) {
+    toggleVideoPlay: function ( pause ) {
 
-        if (this.panorama instanceof VideoPanorama) {
+        if ( this.panorama instanceof VideoPanorama ) {
 
             /**
              * Toggle video event
              * @type {object}
              * @event Viewer#video-toggle
              */
-            this.panorama.dispatchEvent({ type: 'video-toggle', pause: pause });
+            this.panorama.dispatchEvent( { type: 'video-toggle', pause: pause } );
 
         }
 
@@ -701,9 +701,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @instance
      * @fires Viewer#video-time
      */
-    setVideoCurrentTime: function (percentage) {
+    setVideoCurrentTime: function ( percentage ) {
 
-        if (this.panorama instanceof VideoPanorama) {
+        if ( this.panorama instanceof VideoPanorama ) {
 
             /**
              * Setting video time event
@@ -711,7 +711,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
              * @event Viewer#video-time
              * @property {number} percentage - Percentage of a video. Range from 0.0 to 1.0
              */
-            this.panorama.dispatchEvent({ type: 'video-time', percentage: percentage });
+            this.panorama.dispatchEvent( { type: 'video-time', percentage: percentage } );
 
         }
 
@@ -724,7 +724,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @instance
      * @fires Viewer#video-update
      */
-    onVideoUpdate: function (percentage) {
+    onVideoUpdate: function ( percentage ) {
 
         const { widget } = this;
 
@@ -734,7 +734,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @event Viewer#video-update
          * @property {number} percentage - Percentage of a video. Range from 0.0 to 1.0
          */
-        if (widget) { widget.dispatchEvent({ type: 'video-update', percentage: percentage }); }
+        if( widget ) { widget.dispatchEvent( { type: 'video-update', percentage: percentage } ); }
 
     },
 
@@ -744,11 +744,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    addUpdateCallback: function (fn) {
+    addUpdateCallback: function ( fn ) {
 
-        if (fn) {
+        if ( fn ) {
 
-            this.updateCallbacks.push(fn);
+            this.updateCallbacks.push( fn );
 
         }
 
@@ -760,13 +760,13 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    removeUpdateCallback: function (fn) {
+    removeUpdateCallback: function ( fn ) {
 
-        const index = this.updateCallbacks.indexOf(fn);
+        const index = this.updateCallbacks.indexOf( fn );
 
-        if (fn && index >= 0) {
+        if ( fn && index >= 0 ) {
 
-            this.updateCallbacks.splice(index, 1);
+            this.updateCallbacks.splice( index, 1 );
 
         }
 
@@ -786,7 +786,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @type {object}
          * @event Viewer#video-control-show
          */
-        if (widget) { widget.dispatchEvent({ type: 'video-control-show' }); }
+        if( widget ) { widget.dispatchEvent( { type: 'video-control-show' } ); }
 
     },
 
@@ -804,7 +804,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @type {object}
          * @event Viewer#video-control-hide
          */
-        if (widget) { widget.dispatchEvent({ type: 'video-control-hide' }); }
+        if( widget ) { widget.dispatchEvent( { type: 'video-control-hide' } ); }
 
     },
 
@@ -814,13 +814,13 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    updateVideoPlayButton: function (paused) {
+    updateVideoPlayButton: function ( paused ) {
 
         const { widget } = this;
 
-        if (widget && widget.videoElement && widget.videoElement.controlButton) {
+        if ( widget && widget.videoElement && widget.videoElement.controlButton ) {
 
-            widget.videoElement.controlButton.update(paused);
+            widget.videoElement.controlButton.update( paused );
 
         }
 
@@ -832,24 +832,24 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    addPanoramaEventListener: function (pano) {
+    addPanoramaEventListener: function ( pano ) {
 
         // Set camera control on every panorama
-        pano.addEventListener('enter-fade-start', this.setCameraControl.bind(this));
+        pano.addEventListener( 'enter-fade-start', this.setCameraControl.bind( this ) );
 
         // Show and hide widget event only when it's VideoPanorama
-        if (pano instanceof VideoPanorama) {
+        if ( pano instanceof VideoPanorama ) {
 
-            pano.addEventListener('enter-fade-start', this.showVideoWidget.bind(this));
-            pano.addEventListener('leave', function () {
+            pano.addEventListener( 'enter-fade-start', this.showVideoWidget.bind( this ) );
+            pano.addEventListener( 'leave', function () {
 
-                if (!(this.panorama instanceof VideoPanorama)) {
+                if ( !(this.panorama instanceof VideoPanorama) ) {
 
-                    this.hideVideoWidget.call(this);
+                    this.hideVideoWidget.call( this );
 
                 }
-
-            }.bind(this));
+				
+            }.bind( this ) );
 
         }
 
@@ -862,7 +862,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     setCameraControl: function () {
 
-        this.OrbitControls.target.copy(this.panorama.position);
+        this.OrbitControls.target.copy( this.panorama.position );
 
     },
 
@@ -947,7 +947,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     getNextControlId: function () {
 
-        return this.controls[this.getNextControlIndex()].id;
+        return this.controls[ this.getNextControlIndex() ].id;
 
     },
 
@@ -961,9 +961,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         const controls = this.controls;
         const control = this.control;
-        const nextIndex = controls.indexOf(control) + 1;
+        const nextIndex = controls.indexOf( control ) + 1;
 
-        return (nextIndex >= controls.length) ? 0 : nextIndex;
+        return ( nextIndex >= controls.length ) ? 0 : nextIndex;
 
     },
 
@@ -973,7 +973,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    setCameraFov: function (fov) {
+    setCameraFov: function ( fov ) {
 
         this.camera.fov = fov;
         this.camera.updateProjectionMatrix();
@@ -986,39 +986,39 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    enableControl: function (index) {
+    enableControl: function ( index ) {
 
-        index = (index >= 0 && index < this.controls.length) ? index : 0;
+        index = ( index >= 0 && index < this.controls.length ) ? index : 0;
 
         this.control.enabled = false;
 
-        this.control = this.controls[index];
+        this.control = this.controls[ index ];
 
         this.control.enabled = true;
 
-        switch (index) {
+        switch ( index ) {
 
-            case CONTROLS.ORBIT:
+        case CONTROLS.ORBIT:
 
-                this.camera.position.copy(this.panorama.position);
-                this.camera.position.z += 1;
+            this.camera.position.copy( this.panorama.position );
+            this.camera.position.z += 1;
 
-                break;
+            break;
 
-            case CONTROLS.DEVICEORIENTATION:
+        case CONTROLS.DEVICEORIENTATION:
 
-                this.camera.position.copy(this.panorama.position);
+            this.camera.position.copy( this.panorama.position );
 
-                break;
+            break;
 
-            default:
+        default:
 
-                break;
+            break;
         }
 
         this.control.update();
 
-        this.activateWidgetItem(index, undefined);
+        this.activateWidgetItem( index, undefined );
 
     },
 
@@ -1040,7 +1040,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     toggleNextControl: function () {
 
-        this.enableControl(this.getNextControlIndex());
+        this.enableControl( this.getNextControlIndex() );
 
     },
 
@@ -1049,16 +1049,16 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    getScreenVector: function (worldVector) {
+    getScreenVector: function ( worldVector ) {
 
         const vector = worldVector.clone();
-        const widthHalf = (this.container.clientWidth) / 2;
+        const widthHalf = ( this.container.clientWidth ) / 2;
         const heightHalf = this.container.clientHeight / 2;
 
-        vector.project(this.camera);
+        vector.project( this.camera );
 
-        vector.x = (vector.x * widthHalf) + widthHalf;
-        vector.y = - (vector.y * heightHalf) + heightHalf;
+        vector.x = ( vector.x * widthHalf ) + widthHalf;
+        vector.y = - ( vector.y * heightHalf ) + heightHalf;
         vector.z = 0;
 
         return vector;
@@ -1070,13 +1070,13 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    checkSpriteInViewport: function (sprite) {
+    checkSpriteInViewport: function ( sprite ) {
 
-        this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
-        this.cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
-        this.cameraFrustum.setFromMatrix(this.cameraViewProjectionMatrix);
+        this.camera.matrixWorldInverse.getInverse( this.camera.matrixWorld );
+        this.cameraViewProjectionMatrix.multiplyMatrices( this.camera.projectionMatrix, this.camera.matrixWorldInverse );
+        this.cameraFrustum.setFromMatrix( this.cameraViewProjectionMatrix );
 
-        return sprite.visible && this.cameraFrustum.intersectsSprite(sprite);
+        return sprite.visible && this.cameraFrustum.intersectsSprite( sprite );
 
     },
 
@@ -1099,10 +1099,10 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     addReticle: function () {
 
-        this.reticle = new Reticle(0xffffff, true, this.options.dwellTime);
+        this.reticle = new Reticle( 0xffffff, true, this.options.dwellTime );
         this.reticle.hide();
-        this.camera.add(this.reticle);
-        this.sceneReticle.add(this.camera);
+        this.camera.add( this.reticle );
+        this.sceneReticle.add( this.camera );
 
     },
 
@@ -1114,20 +1114,20 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    tweenControlCenter: function (vector, duration, easing) {
+    tweenControlCenter: function ( vector, duration, easing ) {
 
-        if (this.control !== this.OrbitControls) {
+        if ( this.control !== this.OrbitControls ) {
 
             return;
 
         }
 
         // Pass in arguments as array
-        if (vector instanceof Array) {
+        if ( vector instanceof Array ) {
 
-            duration = vector[1];
-            easing = vector[2];
-            vector = vector[0];
+            duration = vector[ 1 ];
+            easing = vector[ 2 ];
+            vector = vector[ 0 ];
 
         }
 
@@ -1138,24 +1138,24 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         scope = this;
 
-        chv = this.camera.getWorldDirection(new THREE.Vector3());
+        chv = this.camera.getWorldDirection( new THREE.Vector3() );
         cvv = chv.clone();
 
-        vptc = this.panorama.getWorldPosition(new THREE.Vector3()).sub(this.camera.getWorldPosition(new THREE.Vector3()));
+        vptc = this.panorama.getWorldPosition( new THREE.Vector3() ).sub( this.camera.getWorldPosition( new THREE.Vector3() ) );
 
         hv = vector.clone();
         // Scale effect
         hv.x *= -1;
-        hv.add(vptc).normalize();
+        hv.add( vptc ).normalize();
         vv = hv.clone();
 
         chv.y = 0;
         hv.y = 0;
 
-        ha = Math.atan2(hv.z, hv.x) - Math.atan2(chv.z, chv.x);
+        ha = Math.atan2( hv.z, hv.x ) - Math.atan2( chv.z, chv.x );
         ha = ha > Math.PI ? ha - 2 * Math.PI : ha;
         ha = ha < -Math.PI ? ha + 2 * Math.PI : ha;
-        va = Math.abs(cvv.angleTo(chv) + (cvv.y * vv.y <= 0 ? vv.angleTo(hv) : -vv.angleTo(hv)));
+        va = Math.abs( cvv.angleTo( chv ) + ( cvv.y * vv.y <= 0 ? vv.angleTo( hv ) : -vv.angleTo( hv ) ) );
         va *= vv.y < cvv.y ? 1 : -1;
 
         ov = { left: 0, up: 0 };
@@ -1164,20 +1164,20 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         this.tweenLeftAnimation.stop();
         this.tweenUpAnimation.stop();
 
-        this.tweenLeftAnimation = new TWEEN.Tween(ov)
-            .to({ left: ha }, duration)
-            .easing(easing)
-            .onUpdate(function (ov) {
-                scope.control.rotateLeft(ov.left - nv.left);
+        this.tweenLeftAnimation = new TWEEN.Tween( ov )
+            .to( { left: ha }, duration )
+            .easing( easing )
+            .onUpdate(function(ov){
+                scope.control.rotateLeft( ov.left - nv.left );
                 nv.left = ov.left;
             })
             .start();
 
-        this.tweenUpAnimation = new TWEEN.Tween(ov)
-            .to({ up: va }, duration)
-            .easing(easing)
-            .onUpdate(function (ov) {
-                scope.control.rotateUp(ov.up - nv.up);
+        this.tweenUpAnimation = new TWEEN.Tween( ov )
+            .to( { up: va }, duration )
+            .easing( easing )
+            .onUpdate(function(ov){
+                scope.control.rotateUp( ov.up - nv.up );
                 nv.up = ov.up;
             })
             .start();
@@ -1192,28 +1192,28 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    tweenControlCenterByObject: function (object, duration, easing) {
+    tweenControlCenterByObject: function ( object, duration, easing ) {
 
         let isUnderScalePlaceHolder = false;
 
-        object.traverseAncestors(function (ancestor) {
+        object.traverseAncestors( function ( ancestor ) {
 
-            if (ancestor.scalePlaceHolder) {
+            if ( ancestor.scalePlaceHolder ) {
 
                 isUnderScalePlaceHolder = true;
 
             }
-        });
+        } );
 
-        if (isUnderScalePlaceHolder) {
+        if ( isUnderScalePlaceHolder ) {
 
-            const invertXVector = new THREE.Vector3(-1, 1, 1);
+            const invertXVector = new THREE.Vector3( -1, 1, 1 );
 
-            this.tweenControlCenter(object.getWorldPosition(new THREE.Vector3()).multiply(invertXVector), duration, easing);
+            this.tweenControlCenter( object.getWorldPosition( new THREE.Vector3() ).multiply( invertXVector ), duration, easing );
 
         } else {
 
-            this.tweenControlCenter(object.getWorldPosition(new THREE.Vector3()), duration, easing);
+            this.tweenControlCenter( object.getWorldPosition( new THREE.Vector3() ), duration, easing );
 
         }
 
@@ -1227,13 +1227,13 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onWindowResize: function (windowWidth, windowHeight) {
+    onWindowResize: function ( windowWidth, windowHeight ) {
 
         let width, height;
 
-        const expand = this.container.classList.contains('panolens-container') || this.container.isFullscreen;
+        const expand = this.container.classList.contains( 'panolens-container' ) || this.container.isFullscreen;
 
-        if (windowWidth !== undefined && windowHeight !== undefined) {
+        if ( windowWidth !== undefined && windowHeight !== undefined ) {
 
             width = windowWidth;
             height = windowHeight;
@@ -1244,12 +1244,12 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
             const isAndroid = /(android)/i.test(window.navigator.userAgent);
 
-            const adjustWidth = isAndroid
-                ? Math.min(document.documentElement.clientWidth, window.innerWidth || 0)
+            const adjustWidth = isAndroid 
+                ? Math.min(document.documentElement.clientWidth, window.innerWidth || 0) 
                 : Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
-            const adjustHeight = isAndroid
-                ? Math.min(document.documentElement.clientHeight, window.innerHeight || 0)
+            const adjustHeight = isAndroid 
+                ? Math.min(document.documentElement.clientHeight, window.innerHeight || 0) 
                 : Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
             width = expand ? adjustWidth : this.container.clientWidth;
@@ -1263,10 +1263,10 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
 
-        this.renderer.setSize(width, height);
+        this.renderer.setSize( width, height );
 
         // Update reticle
-        if (this.options.enableReticle || this.tempEnableReticle) {
+        if ( this.options.enableReticle || this.tempEnableReticle ) {
 
             this.updateReticleEvent();
 
@@ -1279,16 +1279,16 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @property {number} width  - Width of the window
          * @property {number} height - Height of the window
          */
-        this.dispatchEvent({ type: 'window-resize', width: width, height: height });
-        this.scene.traverse(function (object) {
+        this.dispatchEvent( { type: 'window-resize', width: width, height: height });
+        this.scene.traverse( function ( object ) {
 
-            if (object.dispatchEvent) {
+            if ( object.dispatchEvent ) {
 
-                object.dispatchEvent({ type: 'window-resize', width: width, height: height });
+                object.dispatchEvent( { type: 'window-resize', width: width, height: height });
 
             }
 
-        });
+        } );
 
     },
 
@@ -1299,12 +1299,12 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     addOutputElement: function () {
 
-        const element = document.createElement('div');
+        const element = document.createElement( 'div' );
         element.style.position = 'absolute';
         element.style.right = '10px';
         element.style.top = '10px';
         element.style.color = '#fff';
-        this.container.appendChild(element);
+        this.container.appendChild( element );
         this.outputDivElement = element;
 
     },
@@ -1316,31 +1316,31 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     outputPosition: function () {
 
-        const intersects = this.raycaster.intersectObject(this.panorama, true);
+        const intersects = this.raycaster.intersectObject( this.panorama, true );
 
-        if (intersects.length > 0) {
+        if ( intersects.length > 0 ) {
 
-            const point = intersects[0].point.clone();
-            const converter = new THREE.Vector3(-1, 1, 1);
-            const world = this.panorama.getWorldPosition(new THREE.Vector3());
-            point.sub(world).multiply(converter);
+            const point = intersects[ 0 ].point.clone();
+            const converter = new THREE.Vector3( -1, 1, 1 );
+            const world = this.panorama.getWorldPosition( new THREE.Vector3() );
+            point.sub( world ).multiply( converter );
 
             const message = `${point.x.toFixed(2)}, ${point.y.toFixed(2)}, ${point.z.toFixed(2)}`;
 
-            if (point.length() === 0) { return; }
+            if ( point.length() === 0 ) { return; }
 
-            switch (this.options.output) {
+            switch ( this.options.output ) {
 
-                case 'console':
-                    console.info(message);
-                    break;
+            case 'console':
+                console.info( message );
+                break;
 
-                case 'overlay':
-                    this.outputDivElement.textContent = message;
-                    break;
+            case 'overlay':
+                this.outputDivElement.textContent = message;
+                break;
 
-                default:
-                    break;
+            default:
+                break;
 
             }
 
@@ -1354,14 +1354,14 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onMouseDown: function (event) {
+    onMouseDown: function ( event ) {
 
         event.preventDefault();
 
-        this.userMouse.x = (event.clientX >= 0) ? event.clientX : event.touches[0].clientX;
-        this.userMouse.y = (event.clientY >= 0) ? event.clientY : event.touches[0].clientY;
+        this.userMouse.x = ( event.clientX >= 0 ) ? event.clientX : event.touches[0].clientX;
+        this.userMouse.y = ( event.clientY >= 0 ) ? event.clientY : event.touches[0].clientY;
         this.userMouse.type = 'mousedown';
-        this.onTap(event);
+        this.onTap( event );
 
     },
 
@@ -1371,11 +1371,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onMouseMove: function (event) {
+    onMouseMove: function ( event ) {
 
         event.preventDefault();
         this.userMouse.type = 'mousemove';
-        this.onTap(event);
+        this.onTap( event );
 
     },
 
@@ -1385,57 +1385,57 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onMouseUp: function (event) {
+    onMouseUp: function ( event ) {
 
         let onTarget = false;
 
         this.userMouse.type = 'mouseup';
 
-        const type = (this.userMouse.x >= event.clientX - this.options.clickTolerance
-            && this.userMouse.x <= event.clientX + this.options.clickTolerance
-            && this.userMouse.y >= event.clientY - this.options.clickTolerance
-            && this.userMouse.y <= event.clientY + this.options.clickTolerance)
-            || (event.changedTouches
-                && this.userMouse.x >= event.changedTouches[0].clientX - this.options.clickTolerance
-                && this.userMouse.x <= event.changedTouches[0].clientX + this.options.clickTolerance
-                && this.userMouse.y >= event.changedTouches[0].clientY - this.options.clickTolerance
-                && this.userMouse.y <= event.changedTouches[0].clientY + this.options.clickTolerance)
+        const type = ( this.userMouse.x >= event.clientX - this.options.clickTolerance 
+				&& this.userMouse.x <= event.clientX + this.options.clickTolerance
+				&& this.userMouse.y >= event.clientY - this.options.clickTolerance
+				&& this.userMouse.y <= event.clientY + this.options.clickTolerance ) 
+				||  ( event.changedTouches 
+				&& this.userMouse.x >= event.changedTouches[0].clientX - this.options.clickTolerance
+				&& this.userMouse.x <= event.changedTouches[0].clientX + this.options.clickTolerance 
+				&& this.userMouse.y >= event.changedTouches[0].clientY - this.options.clickTolerance
+				&& this.userMouse.y <= event.changedTouches[0].clientY + this.options.clickTolerance ) 
             ? 'click' : undefined;
 
         // Event should happen on canvas
-        if (event && event.target && !event.target.classList.contains('panolens-canvas')) { return; }
+        if ( event && event.target && !event.target.classList.contains( 'panolens-canvas' ) ) { return; }
 
         event.preventDefault();
 
-        if (event.changedTouches && event.changedTouches.length === 1) {
+        if ( event.changedTouches && event.changedTouches.length === 1 ) {
 
-            onTarget = this.onTap({ clientX: event.changedTouches[0].clientX, clientY: event.changedTouches[0].clientY }, type);
-
+            onTarget = this.onTap( { clientX: event.changedTouches[0].clientX, clientY: event.changedTouches[0].clientY }, type );
+		
         } else {
 
-            onTarget = this.onTap(event, type);
+            onTarget = this.onTap( event, type );
 
         }
 
         this.userMouse.type = 'none';
 
-        if (onTarget) {
+        if ( onTarget ) { 
 
-            return;
+            return; 
 
         }
 
-        if (type === 'click') {
+        if ( type === 'click' ) {
 
             const { options: { autoHideInfospot, autoHideControlBar }, panorama, toggleControlBar } = this;
 
-            if (autoHideInfospot && panorama) {
+            if ( autoHideInfospot && panorama ) {
 
                 panorama.toggleInfospotVisibility();
 
             }
 
-            if (autoHideControlBar) {
+            if ( autoHideControlBar ) {
 
                 toggleControlBar();
 
@@ -1452,39 +1452,39 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onTap: function (event, type) {
+    onTap: function ( event, type ) {
 
         const { left, top } = this.container.getBoundingClientRect();
         const { clientWidth, clientHeight } = this.container;
 
-        this.raycasterPoint.x = ((event.clientX - left) / clientWidth) * 2 - 1;
-        this.raycasterPoint.y = - ((event.clientY - top) / clientHeight) * 2 + 1;
+        this.raycasterPoint.x = ( ( event.clientX - left ) / clientWidth ) * 2 - 1;
+        this.raycasterPoint.y = - ( ( event.clientY - top ) / clientHeight ) * 2 + 1;
 
-        this.raycaster.setFromCamera(this.raycasterPoint, this.camera);
+        this.raycaster.setFromCamera( this.raycasterPoint, this.camera );
 
         // Return if no panorama 
-        if (!this.panorama) {
+        if ( !this.panorama ) { 
 
-            return;
+            return; 
 
         }
 
         // output infospot information
-        if (event.type !== 'mousedown' && this.touchSupported || this.OUTPUT_INFOSPOT) {
+        if ( event.type !== 'mousedown' && this.touchSupported || this.OUTPUT_INFOSPOT ) { 
 
-            this.outputPosition();
+            this.outputPosition(); 
 
         }
 
-        const intersects = this.raycaster.intersectObjects(this.panorama.children, true);
-        const intersect_entity = this.getConvertedIntersect(intersects);
-        const intersect = (intersects.length > 0) ? intersects[0].object : undefined;
+        const intersects = this.raycaster.intersectObjects( this.panorama.children, true );
+        const intersect_entity = this.getConvertedIntersect( intersects );
+        const intersect = ( intersects.length > 0 ) ? intersects[0].object : undefined;
 
-        if (this.userMouse.type === 'mouseup') {
+        if ( this.userMouse.type === 'mouseup'  ) {
 
-            if (intersect_entity && this.pressEntityObject === intersect_entity && this.pressEntityObject.dispatchEvent) {
+            if ( intersect_entity && this.pressEntityObject === intersect_entity && this.pressEntityObject.dispatchEvent ) {
 
-                this.pressEntityObject.dispatchEvent({ type: 'pressstop-entity', mouseEvent: event });
+                this.pressEntityObject.dispatchEvent( { type: 'pressstop-entity', mouseEvent: event } );
 
             }
 
@@ -1492,11 +1492,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         }
 
-        if (this.userMouse.type === 'mouseup') {
+        if ( this.userMouse.type === 'mouseup'  ) {
 
-            if (intersect && this.pressObject === intersect && this.pressObject.dispatchEvent) {
+            if ( intersect && this.pressObject === intersect && this.pressObject.dispatchEvent ) {
 
-                this.pressObject.dispatchEvent({ type: 'pressstop', mouseEvent: event });
+                this.pressObject.dispatchEvent( { type: 'pressstop', mouseEvent: event } );
 
             }
 
@@ -1504,32 +1504,32 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         }
 
-        if (type === 'click') {
+        if ( type === 'click' ) {
 
-            this.panorama.dispatchEvent({ type: 'click', intersects: intersects, mouseEvent: event });
+            this.panorama.dispatchEvent( { type: 'click', intersects: intersects, mouseEvent: event } );
 
-            if (intersect_entity && intersect_entity.dispatchEvent) {
+            if ( intersect_entity && intersect_entity.dispatchEvent ) {
 
-                intersect_entity.dispatchEvent({ type: 'click-entity', mouseEvent: event });
+                intersect_entity.dispatchEvent( { type: 'click-entity', mouseEvent: event } );
 
             }
 
-            if (intersect && intersect.dispatchEvent) {
+            if ( intersect && intersect.dispatchEvent ) {
 
-                intersect.dispatchEvent({ type: 'click', mouseEvent: event });
+                intersect.dispatchEvent( { type: 'click', mouseEvent: event } );
 
             }
 
         } else {
 
-            this.panorama.dispatchEvent({ type: 'hover', intersects: intersects, mouseEvent: event });
+            this.panorama.dispatchEvent( { type: 'hover', intersects: intersects, mouseEvent: event } );
 
-            if ((this.hoverObject && intersects.length > 0 && this.hoverObject !== intersect_entity)
-                || (this.hoverObject && intersects.length === 0)) {
+            if ( ( this.hoverObject && intersects.length > 0 && this.hoverObject !== intersect_entity )
+				|| ( this.hoverObject && intersects.length === 0 ) ){
 
-                if (this.hoverObject.dispatchEvent) {
+                if ( this.hoverObject.dispatchEvent ) {
 
-                    this.hoverObject.dispatchEvent({ type: 'hoverleave', mouseEvent: event });
+                    this.hoverObject.dispatchEvent( { type: 'hoverleave', mouseEvent: event } );
 
                     this.reticle.end();
 
@@ -1539,66 +1539,66 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
             }
 
-            if (intersect_entity && intersects.length > 0) {
+            if ( intersect_entity && intersects.length > 0 ) {
 
-                if (this.hoverObject !== intersect_entity) {
+                if ( this.hoverObject !== intersect_entity ) {
 
                     this.hoverObject = intersect_entity;
 
-                    if (this.hoverObject.dispatchEvent) {
+                    if ( this.hoverObject.dispatchEvent ) {
 
-                        this.hoverObject.dispatchEvent({ type: 'hoverenter', mouseEvent: event });
+                        this.hoverObject.dispatchEvent( { type: 'hoverenter', mouseEvent: event } );
 
                         // Start reticle timer
-                        if (this.options.autoReticleSelect && this.options.enableReticle || this.tempEnableReticle) {
-                            this.reticle.start(this.onTap.bind(this, event, 'click'));
+                        if ( this.options.autoReticleSelect && this.options.enableReticle || this.tempEnableReticle ) {
+                            this.reticle.start( this.onTap.bind( this, event, 'click' ) );
                         }
 
                     }
 
                 }
 
-                if (this.userMouse.type === 'mousedown' && this.pressEntityObject != intersect_entity) {
+                if ( this.userMouse.type === 'mousedown' && this.pressEntityObject != intersect_entity ) {
 
                     this.pressEntityObject = intersect_entity;
 
-                    if (this.pressEntityObject.dispatchEvent) {
+                    if ( this.pressEntityObject.dispatchEvent ) {
 
-                        this.pressEntityObject.dispatchEvent({ type: 'pressstart-entity', mouseEvent: event });
+                        this.pressEntityObject.dispatchEvent( { type: 'pressstart-entity', mouseEvent: event } );
 
                     }
 
                 }
 
-                if (this.userMouse.type === 'mousedown' && this.pressObject != intersect) {
+                if ( this.userMouse.type === 'mousedown' && this.pressObject != intersect ) {
 
                     this.pressObject = intersect;
 
-                    if (this.pressObject.dispatchEvent) {
+                    if ( this.pressObject.dispatchEvent ) {
 
-                        this.pressObject.dispatchEvent({ type: 'pressstart', mouseEvent: event });
+                        this.pressObject.dispatchEvent( { type: 'pressstart', mouseEvent: event } );
 
                     }
 
                 }
 
-                if (this.userMouse.type === 'mousemove' || this.options.enableReticle) {
+                if ( this.userMouse.type === 'mousemove' || this.options.enableReticle ) {
 
-                    if (intersect && intersect.dispatchEvent) {
+                    if ( intersect && intersect.dispatchEvent ) {
 
-                        intersect.dispatchEvent({ type: 'hover', mouseEvent: event });
-
-                    }
-
-                    if (this.pressEntityObject && this.pressEntityObject.dispatchEvent) {
-
-                        this.pressEntityObject.dispatchEvent({ type: 'pressmove-entity', mouseEvent: event });
+                        intersect.dispatchEvent( { type: 'hover', mouseEvent: event } );
 
                     }
 
-                    if (this.pressObject && this.pressObject.dispatchEvent) {
+                    if ( this.pressEntityObject && this.pressEntityObject.dispatchEvent ) {
 
-                        this.pressObject.dispatchEvent({ type: 'pressmove', mouseEvent: event });
+                        this.pressEntityObject.dispatchEvent( { type: 'pressmove-entity', mouseEvent: event } );
+
+                    }
+
+                    if ( this.pressObject && this.pressObject.dispatchEvent ) {
+
+                        this.pressObject.dispatchEvent( { type: 'pressmove', mouseEvent: event } );
 
                     }
 
@@ -1606,17 +1606,17 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
             }
 
-            if (!intersect_entity && this.pressEntityObject && this.pressEntityObject.dispatchEvent) {
+            if ( !intersect_entity && this.pressEntityObject && this.pressEntityObject.dispatchEvent ) {
 
-                this.pressEntityObject.dispatchEvent({ type: 'pressstop-entity', mouseEvent: event });
+                this.pressEntityObject.dispatchEvent( { type: 'pressstop-entity', mouseEvent: event } );
 
                 this.pressEntityObject = undefined;
 
             }
 
-            if (!intersect && this.pressObject && this.pressObject.dispatchEvent) {
+            if ( !intersect && this.pressObject && this.pressObject.dispatchEvent ) {
 
-                this.pressObject.dispatchEvent({ type: 'pressstop', mouseEvent: event });
+                this.pressObject.dispatchEvent( { type: 'pressstop', mouseEvent: event } );
 
                 this.pressObject = undefined;
 
@@ -1625,37 +1625,37 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         }
 
         // Infospot handler
-        if (intersect && intersect instanceof Infospot) {
+        if ( intersect && intersect instanceof Infospot ) {
 
             this.infospot = intersect;
-
-            if (type === 'click') {
+			
+            if ( type === 'click' ) {
 
                 return true;
 
             }
+			
 
-
-        } else if (this.infospot) {
+        } else if ( this.infospot ) {
 
             this.hideInfospot();
 
         }
 
         // Auto rotate
-        if (this.options.autoRotate && this.userMouse.type !== 'mousemove') {
+        if ( this.options.autoRotate && this.userMouse.type !== 'mousemove' ) {
 
             // Auto-rotate idle timer
-            clearTimeout(this.autoRotateRequestId);
+            clearTimeout( this.autoRotateRequestId );
 
-            if (this.control === this.OrbitControls) {
+            if ( this.control === this.OrbitControls ) {
 
                 this.OrbitControls.autoRotate = false;
-                this.autoRotateRequestId = window.setTimeout(this.enableAutoRate.bind(this), this.options.autoRotateActivationDuration);
+                this.autoRotateRequestId = window.setTimeout( this.enableAutoRate.bind( this ), this.options.autoRotateActivationDuration );
 
             }
 
-        }
+        }		
 
     },
 
@@ -1665,17 +1665,17 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    getConvertedIntersect: function (intersects) {
+    getConvertedIntersect: function ( intersects ) {
 
         let intersect;
 
-        for (let i = 0; i < intersects.length; i++) {
+        for ( let i = 0; i < intersects.length; i++ ) {
 
-            if (intersects[i].distance >= 0 && intersects[i].object && !intersects[i].object.passThrough) {
+            if ( intersects[i].distance >= 0 && intersects[i].object && !intersects[i].object.passThrough ) {
 
-                if (intersects[i].object.entity && intersects[i].object.entity.passThrough) {
+                if ( intersects[i].object.entity && intersects[i].object.entity.passThrough ) {
                     continue;
-                } else if (intersects[i].object.entity && !intersects[i].object.entity.passThrough) {
+                } else if ( intersects[i].object.entity && !intersects[i].object.entity.passThrough ) {
                     intersect = intersects[i].object.entity;
                     break;
                 } else {
@@ -1698,7 +1698,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     hideInfospot: function () {
 
-        if (this.infospot) {
+        if ( this.infospot ) {
 
             this.infospot.onHoverEnd();
 
@@ -1723,9 +1723,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
          * @type {object}
          * @event Viewer#control-bar-toggle
          */
-        if (widget) {
+        if ( widget ) {
 
-            widget.dispatchEvent({ type: 'control-bar-toggle' });
+            widget.dispatchEvent( { type: 'control-bar-toggle' } );
 
         }
 
@@ -1737,9 +1737,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onKeyDown: function (event) {
+    onKeyDown: function ( event ) {
 
-        if (this.options.output && this.options.output !== 'none' && event.key === 'Control') {
+        if ( this.options.output && this.options.output !== 'none' && event.key === 'Control' ) {
 
             this.OUTPUT_INFOSPOT = true;
 
@@ -1768,26 +1768,26 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         TWEEN.update();
 
-        this.updateCallbacks.forEach(function (callback) { callback(); });
+        this.updateCallbacks.forEach( function( callback ){ callback(); } );
 
         this.control.update();
 
-        this.scene.traverse(function (child) {
-            if (child instanceof Infospot
-                && child.element
-                && (this.hoverObject === child
-                    || child.element.style.display !== 'none'
-                    || (child.element.left && child.element.left.style.display !== 'none')
-                    || (child.element.right && child.element.right.style.display !== 'none'))) {
-                if (this.checkSpriteInViewport(child)) {
-                    const { x, y } = this.getScreenVector(child.getWorldPosition(new THREE.Vector3()));
-                    child.translateElement(x, y);
+        this.scene.traverse( function( child ){
+            if ( child instanceof Infospot 
+				&& child.element 
+				&& ( this.hoverObject === child 
+					|| child.element.style.display !== 'none' 
+					|| (child.element.left && child.element.left.style.display !== 'none')
+					|| (child.element.right && child.element.right.style.display !== 'none') ) ) {
+                if ( this.checkSpriteInViewport( child ) ) {
+                    const { x, y } = this.getScreenVector( child.getWorldPosition( new THREE.Vector3() ) );
+                    child.translateElement( x, y );
                 } else {
                     child.onDismiss();
                 }
-
+				
             }
-        }.bind(this));
+        }.bind( this ) );
 
     },
 
@@ -1799,19 +1799,19 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     render: function () {
 
-        if (this.mode === MODES.CARDBOARD || this.mode === MODES.STEREO) {
+        if ( this.mode === MODES.CARDBOARD || this.mode === MODES.STEREO ) {
 
             this.renderer.clear();
-            this.effect.render(this.scene, this.camera);
-            this.effect.render(this.sceneReticle, this.camera);
-
+            this.effect.render( this.scene, this.camera );
+            this.effect.render( this.sceneReticle, this.camera );
+			
 
         } else {
 
             this.renderer.clear();
-            this.renderer.render(this.scene, this.camera);
+            this.renderer.render( this.scene, this.camera );
             this.renderer.clearDepth();
-            this.renderer.render(this.sceneReticle, this.camera);
+            this.renderer.render( this.sceneReticle, this.camera );
 
         }
 
@@ -1824,7 +1824,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     animate: function () {
 
-        this.requestAnimationId = window.requestAnimationFrame(this.animate.bind(this));
+        this.requestAnimationId = window.requestAnimationFrame( this.animate.bind( this ) );
 
         this.onChange();
 
@@ -1851,11 +1851,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         const options = { passive: false };
 
-        this.container.addEventListener('mousedown', this.HANDLER_MOUSE_DOWN, options);
-        this.container.addEventListener('mousemove', this.HANDLER_MOUSE_MOVE, options);
-        this.container.addEventListener('mouseup', this.HANDLER_MOUSE_UP, options);
-        this.container.addEventListener('touchstart', this.HANDLER_MOUSE_DOWN, options);
-        this.container.addEventListener('touchend', this.HANDLER_MOUSE_UP, options);
+        this.container.addEventListener( 'mousedown' , 	this.HANDLER_MOUSE_DOWN, options );
+        this.container.addEventListener( 'mousemove' , 	this.HANDLER_MOUSE_MOVE, options );
+        this.container.addEventListener( 'mouseup'	 , 	this.HANDLER_MOUSE_UP  , options );
+        this.container.addEventListener( 'touchstart', 	this.HANDLER_MOUSE_DOWN, options );
+        this.container.addEventListener( 'touchend'  , 	this.HANDLER_MOUSE_UP  , options );
 
     },
 
@@ -1866,11 +1866,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     unregisterMouseAndTouchEvents: function () {
 
-        this.container.removeEventListener('mousedown', this.HANDLER_MOUSE_DOWN, false);
-        this.container.removeEventListener('mousemove', this.HANDLER_MOUSE_MOVE, false);
-        this.container.removeEventListener('mouseup', this.HANDLER_MOUSE_UP, false);
-        this.container.removeEventListener('touchstart', this.HANDLER_MOUSE_DOWN, false);
-        this.container.removeEventListener('touchend', this.HANDLER_MOUSE_UP, false);
+        this.container.removeEventListener( 'mousedown' ,  this.HANDLER_MOUSE_DOWN, false );
+        this.container.removeEventListener( 'mousemove' ,  this.HANDLER_MOUSE_MOVE, false );
+        this.container.removeEventListener( 'mouseup'	,  this.HANDLER_MOUSE_UP  , false );
+        this.container.removeEventListener( 'touchstart',  this.HANDLER_MOUSE_DOWN, false );
+        this.container.removeEventListener( 'touchend'  ,  this.HANDLER_MOUSE_UP  , false );
 
     },
 
@@ -1881,7 +1881,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     registerReticleEvent: function () {
 
-        this.addUpdateCallback(this.HANDLER_TAP);
+        this.addUpdateCallback( this.HANDLER_TAP );
 
     },
 
@@ -1892,7 +1892,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      */
     unregisterReticleEvent: function () {
 
-        this.removeUpdateCallback(this.HANDLER_TAP);
+        this.removeUpdateCallback( this.HANDLER_TAP );
 
     },
 
@@ -1906,9 +1906,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         const clientX = this.container.clientWidth / 2 + this.container.offsetLeft;
         const clientY = this.container.clientHeight / 2;
 
-        this.removeUpdateCallback(this.HANDLER_TAP);
-        this.HANDLER_TAP = this.onTap.bind(this, { clientX, clientY });
-        this.addUpdateCallback(this.HANDLER_TAP);
+        this.removeUpdateCallback( this.HANDLER_TAP );
+        this.HANDLER_TAP = this.onTap.bind( this, { clientX, clientY } );
+        this.addUpdateCallback( this.HANDLER_TAP );
 
     },
 
@@ -1920,11 +1920,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
     registerEventListeners: function () {
 
         // Resize Event
-        window.addEventListener('resize', this.HANDLER_WINDOW_RESIZE, true);
+        window.addEventListener( 'resize' , this.HANDLER_WINDOW_RESIZE, true );
 
         // Keyboard Event
-        window.addEventListener('keydown', this.HANDLER_KEY_DOWN, true);
-        window.addEventListener('keyup', this.HANDLER_KEY_UP, true);
+        window.addEventListener( 'keydown', this.HANDLER_KEY_DOWN, true );
+        window.addEventListener( 'keyup'  , this.HANDLER_KEY_UP	 , true );
 
     },
 
@@ -1936,11 +1936,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
     unregisterEventListeners: function () {
 
         // Resize Event
-        window.removeEventListener('resize', this.HANDLER_WINDOW_RESIZE, true);
+        window.removeEventListener( 'resize' , this.HANDLER_WINDOW_RESIZE, true );
 
         // Keyboard Event
-        window.removeEventListener('keydown', this.HANDLER_KEY_DOWN, true);
-        window.removeEventListener('keyup', this.HANDLER_KEY_UP, true);
+        window.removeEventListener( 'keydown', this.HANDLER_KEY_DOWN, true );
+        window.removeEventListener( 'keyup'  , this.HANDLER_KEY_UP  , true );
 
     },
 
@@ -1958,32 +1958,32 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         this.unregisterEventListeners();
 
         // recursive disposal on 3d objects
-        function recursiveDispose(object) {
+        function recursiveDispose ( object ) {
 
-            for (let i = object.children.length - 1; i >= 0; i--) {
+            for ( let i = object.children.length - 1; i >= 0; i-- ) {
 
-                recursiveDispose(object.children[i]);
-                object.remove(object.children[i]);
+                recursiveDispose( object.children[i] );
+                object.remove( object.children[i] );
 
             }
 
-            if (object instanceof Panorama || object instanceof Infospot) {
+            if ( object instanceof Panorama || object instanceof Infospot ) {
 
                 object.dispose();
                 object = null;
 
-            } else if (object.dispatchEvent) {
+            } else if ( object.dispatchEvent ){
 
-                object.dispatchEvent('dispose');
+                object.dispatchEvent( 'dispose' );
 
             }
 
         }
 
-        recursiveDispose(this.scene);
+        recursiveDispose( this.scene );
 
         // dispose widget
-        if (this.widget) {
+        if ( this.widget ) {
 
             this.widget.dispose();
             this.widget = null;
@@ -1991,7 +1991,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
         }
 
         // clear cache
-        if (THREE.Cache && THREE.Cache.enabled) {
+        if ( THREE.Cache && THREE.Cache.enabled ) {
 
             THREE.Cache.clear();
 
@@ -2008,7 +2008,7 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         this.dispose();
         this.render();
-        window.cancelAnimationFrame(this.requestAnimationId);
+        window.cancelAnimationFrame( this.requestAnimationId );		
 
     },
 
@@ -2017,15 +2017,15 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    onPanoramaDispose: function (panorama) {
+    onPanoramaDispose: function ( panorama ) {
 
-        if (panorama instanceof VideoPanorama) {
+        if ( panorama instanceof VideoPanorama ) {
 
             this.hideVideoWidget();
 
         }
 
-        if (panorama === this.panorama) {
+        if ( panorama === this.panorama ) {
 
             this.panorama = null;
 
@@ -2040,14 +2040,14 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    loadAsyncRequest: function (url, callback = () => { }) {
+    loadAsyncRequest: function ( url, callback = () => {} ) {
 
         const request = new window.XMLHttpRequest();
-        request.onloadend = function (event) {
-            callback(event);
+        request.onloadend = function ( event ) {
+            callback( event );
         };
-        request.open('GET', url, true);
-        request.send(null);
+        request.open( 'GET', url, true );
+        request.send( null );
 
     },
 
@@ -2060,9 +2060,9 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
         const scope = this;
 
-        function loadViewIndicator(asyncEvent) {
+        function loadViewIndicator ( asyncEvent ) {
 
-            if (asyncEvent.loaded === 0) return;
+            if ( asyncEvent.loaded === 0 ) return;
 
             const viewIndicatorDiv = asyncEvent.target.responseXML.documentElement;
             viewIndicatorDiv.style.width = scope.viewIndicatorSize + 'px';
@@ -2074,31 +2074,31 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
             viewIndicatorDiv.style.cursor = 'pointer';
             viewIndicatorDiv.id = 'panolens-view-indicator-container';
 
-            scope.container.appendChild(viewIndicatorDiv);
+            scope.container.appendChild( viewIndicatorDiv );
 
-            const indicator = viewIndicatorDiv.querySelector('#indicator');
+            const indicator = viewIndicatorDiv.querySelector( '#indicator' );
             const setIndicatorD = function () {
 
                 scope.radius = scope.viewIndicatorSize * 0.225;
-                scope.currentPanoAngle = scope.camera.rotation.y - THREE.Math.degToRad(90);
-                scope.fovAngle = THREE.Math.degToRad(scope.camera.fov);
+                scope.currentPanoAngle = scope.camera.rotation.y - THREE.Math.degToRad( 90 );
+                scope.fovAngle = THREE.Math.degToRad( scope.camera.fov ) ;
                 scope.leftAngle = -scope.currentPanoAngle - scope.fovAngle / 2;
                 scope.rightAngle = -scope.currentPanoAngle + scope.fovAngle / 2;
-                scope.leftX = scope.radius * Math.cos(scope.leftAngle);
-                scope.leftY = scope.radius * Math.sin(scope.leftAngle);
-                scope.rightX = scope.radius * Math.cos(scope.rightAngle);
-                scope.rightY = scope.radius * Math.sin(scope.rightAngle);
+                scope.leftX = scope.radius * Math.cos( scope.leftAngle );
+                scope.leftY = scope.radius * Math.sin( scope.leftAngle );
+                scope.rightX = scope.radius * Math.cos( scope.rightAngle );
+                scope.rightY = scope.radius * Math.sin( scope.rightAngle );
                 scope.indicatorD = 'M ' + scope.leftX + ' ' + scope.leftY + ' A ' + scope.radius + ' ' + scope.radius + ' 0 0 1 ' + scope.rightX + ' ' + scope.rightY;
 
-                if (scope.leftX && scope.leftY && scope.rightX && scope.rightY && scope.radius) {
+                if ( scope.leftX && scope.leftY && scope.rightX && scope.rightY && scope.radius ) {
 
-                    indicator.setAttribute('d', scope.indicatorD);
+                    indicator.setAttribute( 'd', scope.indicatorD );
 
                 }
 
             };
 
-            scope.addUpdateCallback(setIndicatorD);
+            scope.addUpdateCallback( setIndicatorD );
 
             const indicatorOnMouseEnter = function () {
 
@@ -2112,11 +2112,11 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
             };
 
-            viewIndicatorDiv.addEventListener('mouseenter', indicatorOnMouseEnter);
-            viewIndicatorDiv.addEventListener('mouseleave', indicatorOnMouseLeave);
+            viewIndicatorDiv.addEventListener( 'mouseenter', indicatorOnMouseEnter );
+            viewIndicatorDiv.addEventListener( 'mouseleave', indicatorOnMouseLeave );
         }
 
-        this.loadAsyncRequest(DataImage.ViewIndicator, loadViewIndicator);
+        this.loadAsyncRequest( DataImage.ViewIndicator, loadViewIndicator );
 
     },
 
@@ -2126,17 +2126,17 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
      * @memberOf Viewer
      * @instance
      */
-    appendControlItem: function (option) {
+    appendControlItem: function ( option ) {
 
-        const item = this.widget.createCustomItem(option);
+        const item = this.widget.createCustomItem( option );		
 
-        if (option.group === 'video') {
+        if ( option.group === 'video' ) {
 
-            this.widget.videoElement.appendChild(item);
+            this.widget.videoElement.appendChild( item );
 
         } else {
 
-            this.widget.barElement.appendChild(item);
+            this.widget.barElement.appendChild( item );
 
         }
 
@@ -2155,6 +2155,6 @@ Viewer.prototype = Object.assign(Object.create(THREE.EventDispatcher.prototype),
 
     }
 
-});
+} );
 
 export { Viewer };
