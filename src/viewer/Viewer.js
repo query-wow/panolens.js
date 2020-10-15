@@ -1703,6 +1703,7 @@ Viewer.prototype = Object.assign( Object.create( THREE.EventDispatcher.prototype
 
         if ( this.infospot ) {
 
+            this.infospot.unlockHoverElement();
             this.infospot.onHoverEnd();
 
             this.infospot = undefined;

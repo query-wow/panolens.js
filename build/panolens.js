@@ -1917,7 +1917,7 @@
 
 	    this.type = 'infospot';
 
-	    this.animated = animated !== undefined ? animated : true;
+	    this.animated = animated !== undefined ? animated : false;
 	    this.isHovering = false;
 
 	    /*
@@ -2168,7 +2168,6 @@
 
 	            scaleUpAnimation.stop();
 	            scaleDownAnimation.start();
-
 	        }
 
 	        if ( element && !this.element.locked ) {

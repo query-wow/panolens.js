@@ -1913,7 +1913,7 @@ function Infospot ( scale = 300, imageSrc, animated ) {
 
     this.type = 'infospot';
 
-    this.animated = animated !== undefined ? animated : true;
+    this.animated = animated !== undefined ? animated : false;
     this.isHovering = false;
 
     /*
@@ -2164,7 +2164,6 @@ Infospot.prototype = Object.assign( Object.create( Sprite.prototype ), {
 
             scaleUpAnimation.stop();
             scaleDownAnimation.start();
-
         }
 
         if ( element && !this.element.locked ) {
