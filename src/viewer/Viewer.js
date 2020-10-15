@@ -89,6 +89,9 @@ function Viewer ( options ) {
 
     }
 
+    container._naturalWidth = container.clientWidth;
+    container._naturalHeight = container.clientHeight;
+
     this.container = container;
 
     this.camera = options.camera || new THREE.PerspectiveCamera( this.options.cameraFov, this.container.clientWidth / this.container.clientHeight, 1, 10000 );
@@ -1252,8 +1255,8 @@ Viewer.prototype = Object.assign( Object.create( THREE.EventDispatcher.prototype
                 ? Math.min(document.documentElement.clientHeight, window.innerHeight || 0) 
                 : Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-            width = expand ? adjustWidth : this.container.clientWidth;
-            height = expand ? adjustHeight : this.container.clientHeight;
+            width = expand ? adjustWidth : this.container._naturalWidth;
+            height = expand ? adjustHeight : this.container._naturalHeight;
 
             this.container._width = width;
             this.container._height = height;

@@ -423,7 +423,6 @@ Widget.prototype = Object.assign( Object.create( THREE.EventDispatcher.prototype
             this.style.backgroundImage = ( isFullscreen ) 
                 ? 'url("' + DataImage.FullscreenLeave + '")' 
                 : 'url("' + DataImage.FullscreenEnter + '")';
-
         }
 
         function onFullScreenChange () {
@@ -436,6 +435,11 @@ Widget.prototype = Object.assign( Object.create( THREE.EventDispatcher.prototype
                     ? 'url("' + DataImage.FullscreenLeave + '")' 
                     : 'url("' + DataImage.FullscreenEnter + '")';
 
+            }
+            
+            if(container)
+            {
+                container.isFullscreen = isFullscreen;
             }
 
             /**

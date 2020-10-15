@@ -2989,7 +2989,6 @@ Widget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
             this.style.backgroundImage = ( isFullscreen ) 
                 ? 'url("' + DataImage.FullscreenLeave + '")' 
                 : 'url("' + DataImage.FullscreenEnter + '")';
-
         }
 
         function onFullScreenChange () {
@@ -3002,6 +3001,11 @@ Widget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
                     ? 'url("' + DataImage.FullscreenLeave + '")' 
                     : 'url("' + DataImage.FullscreenEnter + '")';
 
+            }
+            
+            if(container)
+            {
+                container.isFullscreen = isFullscreen;
             }
 
             /**
@@ -7471,6 +7475,9 @@ function Viewer ( options ) {
 
     }
 
+    container._naturalWidth = container.clientWidth;
+    container._naturalHeight = container.clientHeight;
+
     this.container = container;
 
     this.camera = options.camera || new PerspectiveCamera( this.options.cameraFov, this.container.clientWidth / this.container.clientHeight, 1, 10000 );
@@ -7677,6 +7684,25 @@ Viewer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
         }
 
+    },
+
+    getPosition: function () {
+        var intersects, point, panoramaWorldPosition, outputPosition;
+        intersects = this.raycaster.intersectObject( this.panorama, true );
+    
+        if ( intersects.length > 0 ) {
+            point = intersects[0].point;
+            panoramaWorldPosition = this.panorama.getWorldPosition(new Vector3());
+    
+            // Panorama is scaled -1 on X axis
+            outputPosition = new Vector3(
+                -(point.x - panoramaWorldPosition.x).toFixed(2),
+                parseFloat((point.y - panoramaWorldPosition.y).toFixed(2)),
+                parseFloat((point.z - panoramaWorldPosition.z).toFixed(2))
+            );
+        }
+    
+        return outputPosition;
     },
 
     /**
@@ -8614,8 +8640,8 @@ Viewer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
                 ? Math.min(document.documentElement.clientHeight, window.innerHeight || 0) 
                 : Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-            width = expand ? adjustWidth : this.container.clientWidth;
-            height = expand ? adjustHeight : this.container.clientHeight;
+            width = expand ? adjustWidth : this.container._naturalWidth;
+            height = expand ? adjustHeight : this.container._naturalHeight;
 
             this.container._width = width;
             this.container._height = height;
